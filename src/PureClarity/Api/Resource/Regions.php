@@ -8,15 +8,17 @@ namespace PureClarity\Api\Resource;
 
 /**
  * Class Regions
+ *
+ * Handles Data related to PureClarity Regions
  */
 class Regions
 {
     /**
-     * Default PureClarity regions
+     * Default PureClarity Regions
      *
      * @var array[]
      */
-    private static $regions = [
+    private $regions = [
         1 => [
             'label' => 'Europe',
             'name' => 'eu-west-1',
@@ -33,6 +35,14 @@ class Regions
                 'sftp' => 'https://sftp-us-e-1.pureclarity.net',
             ]
         ],
+        99 => [
+            'label' => 'UK',
+            'name' => 'uk',
+            'endpoints' => [
+                'api' => 'https://api-eu-w-1.pureclarity.net',
+                'sftp' => 'https://sftp-eu-w-1.pureclarity.net',
+            ]
+        ],
     ];
 
     /**
@@ -40,10 +50,10 @@ class Regions
      *
      * @return array[]
      */
-    public static function getRegionLabels()
+    public function getRegionLabels()
     {
         $regions = [];
-        foreach (self::$regions as $value => $info) {
+        foreach ($this->regions as $value => $info) {
             $regions[$value] = [
                 'value' => $value,
                 'label' => $info['label']
@@ -54,42 +64,44 @@ class Regions
     }
 
     /**
-     * Gets array of valid regions for use in a dropdown
+     * Gets the name for the provided region
      *
-     * @param string $region
-     * @return array|false|mixed|string|null
+     * @param integer $region
+     * @return string
      */
-    public static function getRegionName($region)
+    public function getRegionName($region)
     {
         $localRegion = getenv('PURECLARITY_REGION');
 
         if ($localRegion) {
             $regionName = $localRegion;
         } else {
-            $regionName = isset(self::$regions[$region]) ? self::$regions[$region]['name'] : null;
+            $regionName = isset($this->regions[$region]) ? $this->regions[$region]['name'] : null;
         }
 
         return $regionName;
     }
 
     /**
-     * Gets array of valid regions for use in a dropdown
+     * Gets array of info related to the provided region
      *
-     * @param string $region
+     * @param integer $region
      * @return array|false|mixed|string|null
      */
-    public static function getRegion($region)
+    public function getRegion($region)
     {
-        return isset(self::$regions[$region]) ? self::$regions[$region] : null;
+        return isset($this->regions[$region]) ? $this->regions[$region] : null;
     }
 
     /**
-     * Gets array of valid regions for use in a dropdown
+     * Simple check to see if a region ID exists
+     *
+     * @param integer $region
      *
      * @return mixed|null
      */
-    public static function isValidRegion($region)
+    public function isValidRegion($region)
     {
-        return isset(self::$regions[$region]);
+        return isset($this->regions[$region]);
     }
 }

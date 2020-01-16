@@ -10,26 +10,35 @@ use Exception;
 
 /**
  * Class Endpoints
+ *
+ * Handles generation of Endpoint URLs for the provided region
  */
 class Endpoints
 {
+    /**
+     * Region data cache
+     *
+     * @var array[]
+     */
+    private $regions = [];
+
     /**
      * Default PureClarity ClientScript URL
      *
      * @var string
      */
-    private static $scriptUrl = '//pcs.pureclarity.net';
+    private $scriptUrl = '//pcs.pureclarity.net';
 
     /**
-     * Gets the PureClarity delta endpoint for the given store
+     * Gets the PureClarity delta endpoint for the given region
      *
      * @param integer $region
      * @return string
      * @throws Exception
      */
-    public static function getDeltaEndpoint($region)
+    public function getDeltaEndpoint($region)
     {
-        return self::getApiUrl($region) . '/api/productdelta';
+        return $this->getApiUrl($region) . '/api/productdelta';
     }
 
     /**
@@ -39,9 +48,9 @@ class Endpoints
      * @return string
      * @throws Exception
      */
-    public static function getSignupRequestEndpoint($region)
+    public function getSignupRequestEndpoint($region)
     {
-        return self::getApiUrl($region) . '/api/plugin/signuprequest';
+        return $this->getApiUrl($region) . '/api/plugin/signuprequest';
     }
 
     /**
@@ -51,9 +60,9 @@ class Endpoints
      * @return string
      * @throws Exception
      */
-    public static function getSignupStatusEndpoint($region)
+    public function getSignupStatusEndpoint($region)
     {
-        return self::getApiUrl($region) . '/api/plugin/signupstatus';
+        return $this->getApiUrl($region) . '/api/plugin/signupstatus';
     }
 
     /**
@@ -63,30 +72,29 @@ class Endpoints
      *
      * @return string
      */
-    public static function getClientScriptUrl($accessKey)
+    public function getClientScriptUrl($accessKey)
     {
         $pureclarityScriptUrl = getenv('PURECLARITY_SCRIPT_URL');
         if ($pureclarityScriptUrl !== null && $pureclarityScriptUrl !== '') {
             $pureclarityScriptUrl .= $accessKey . '/dev.js';
             return $pureclarityScriptUrl;
         } else {
-            $pureclarityScriptUrl = self::$scriptUrl . '/' . $accessKey . '/cs.js';
+            $pureclarityScriptUrl = $this->scriptUrl . '/' . $accessKey . '/cs.js';
         }
 
         return $pureclarityScriptUrl;
     }
 
     /**
+     * Gets the PureClarity SFTP endpoint for the given region
+     *
      * @param integer $region
      * @return string
      * @throws Exception
      */
-    public static function getSftpEndpoint($region)
+    public function getSftpEndpoint($region)
     {
-        $regionData = Regions::getRegion($region);
-        if (!$regionData) {
-            throw new Exception('Invalid Region supplied');
-        }
+        $regionData = $this->getRegion($region);
 
         $url = getenv('PURECLARITY_FEED_HOST');
         if (empty($url)) {
@@ -102,17 +110,15 @@ class Endpoints
     }
 
     /**
+     * Gets the base PureClarity API URL for the given region
+     *
      * @param $region
-     * @return array|false|string
+     * @return string
      * @throws Exception
      */
-    private static function getApiUrl($region)
+    private function getApiUrl($region)
     {
-        $regionData = Regions::getRegion($region);
-        if (!$regionData) {
-            throw new Exception('Invalid Region supplied');
-        }
-
+        $regionData = $this->getRegion($region);
         $host = getenv('PURECLARITY_HOST');
         if ($host != null && $host != '') {
             $parsed = parse_url($host);
@@ -124,5 +130,26 @@ class Endpoints
         }
 
         return $host;
+    }
+
+    /**
+     * Gets the Region information for the provided region
+     *
+     * @param integer $region
+     * @return mixed[]
+     * @throws Exception
+     */
+    private function getRegion($region)
+    {
+        if (!isset($this->regions[$region])) {
+            $regions = new Regions();
+            $regionData = $regions->getRegion($region);
+            if (!$regionData) {
+                throw new Exception('Invalid Region supplied');
+            }
+            $this->regions[$region] = $regionData;
+        }
+
+        return $this->regions[$region];
     }
 }
