@@ -8,16 +8,30 @@ namespace PureClarity\Api\Feed;
 
 use Exception;
 
+/**
+ * Class Feed
+ *
+ * Feed Base class - handles building & sending of a Feed
+ */
 abstract class Feed
 {
+    /** @var string */
     const FEED_TYPE_BRAND = 'brand';
+
+    /** @var string */
     const FEED_TYPE_CATEGORY = 'category';
+
+    /** @var string */
     const FEED_TYPE_PRODUCT = 'product';
+
+    /** @var string */
     const FEED_TYPE_ORDER = 'orders';
+
+    /** @var string */
     const FEED_TYPE_USER = 'user';
 
     /** @var int $dataIndex */
-    protected $dataIndex = 1;
+    protected $dataIndex = 0;
 
     /** @var string $feedType */
     protected $feedType;
@@ -35,11 +49,11 @@ abstract class Feed
     protected $nonEmptyFields = [];
 
     /** @var string $pageData - Feed Data */
-    protected $pageData;
+    protected $pageData = '';
 
     /** @var integer $pageSize - Feed Handler class */
     protected $pageSize = 50;
-
+    
     /** @var Transfer $transfer - Feed Sending Handler class */
     private $transfer;
 
@@ -66,7 +80,8 @@ abstract class Feed
     }
 
     /**
-     * Calls the create method to initialize the feed process
+     * Calls the create method on the feed transfer object to initialize the feed process
+     *
      * @throws Exception
      */
     public function start()
@@ -75,6 +90,10 @@ abstract class Feed
     }
 
     /**
+     * Appends the provided data to the feed.
+     *
+     * If we hit the page limit, then calls the append method on the feed transfer object to send the page of data
+     *
      * @param mixed[] $data
      * @throws Exception
      */
@@ -85,8 +104,8 @@ abstract class Feed
             throw new Exception(implode('|', $errors));
         }
 
-        $this->pageData .= $this->processData($data);
         $this->dataIndex++;
+        $this->pageData .= $this->processData($data);
 
         if (($this->dataIndex % $this->pageSize) === 0) {
             $this->transfer->append($this->pageData);
@@ -95,12 +114,14 @@ abstract class Feed
     }
 
     /**
-     * @param $data
+     * Formats the data to add to the feed
+     *
+     * @param mixed[] $data
      * @return false|string
      */
     protected function processData($data)
     {
-        $product['_index'] = $this->dataIndex;
+        $data['_index'] = $this->dataIndex;
 
         if ($this->dataIndex >= 2) {
             $this->pageData .= ',';
@@ -110,6 +131,7 @@ abstract class Feed
     }
 
     /**
+     * Validates the provided feed data
      * @param mixed[] $data
      * @return array
      */
@@ -131,6 +153,10 @@ abstract class Feed
     }
 
     /**
+     * Calls the close method on the feed transfer object to end the feed process
+     *
+     * Sends any unset page data if necessary
+     *
      * @throws Exception
      */
     public function end()
