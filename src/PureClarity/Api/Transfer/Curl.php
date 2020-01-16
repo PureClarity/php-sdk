@@ -6,6 +6,8 @@
 
 namespace PureClarity\Api\Transfer;
 
+use PureClarity\Api\Transfer\Curl\Client;
+
 /**
  * Class Curl
  *
@@ -15,7 +17,7 @@ namespace PureClarity\Api\Transfer;
  */
 class Curl
 {
-    /** @var array  */
+    /** @var mixed[] - Default CURL options, can be overridden per request */
     private $options = [
         CURLOPT_CONNECTTIMEOUT_MS => 5000,
         CURLOPT_TIMEOUT_MS => 5000,
@@ -31,13 +33,21 @@ class Curl
     private $dataType = 'application/json';
 
     /** @var string|null $status */
-    private $status;
+    private $status = '';
 
     /** @var string|null $body */
-    private $body;
+    private $body = '';
 
     /** @var string|null $error */
-    private $error;
+    private $error = '';
+
+    /**
+     * Returns current data type
+     */
+    public function getDataType()
+    {
+        return $this->dataType;
+    }
 
     /**
      * @param string $dataType
@@ -48,27 +58,29 @@ class Curl
     }
 
     /**
-     * @param string $url
-     * @param string $payload
-     * @param array $options
+     * POSTs the CURL request
+     *
+     * @param string $url - URL to post to
+     * @param string $payload - Data to send
+     * @param array $options - options to set (can be used to override defaults)
      */
     public function post($url, $payload, $options = [])
     {
-        $request = curl_init();
+        $request = new Client();
+        $request->init();
 
-        curl_setopt($request, CURLOPT_URL, $url);
+        $request->setopt(CURLOPT_URL, $url);
 
         foreach ($this->options as $optionKey => $optValue) {
-            curl_setopt($request, $optionKey, $optValue);
+            $request->setopt($optionKey, $optValue);
         }
 
         foreach ($options as $optionKey => $optValue) {
-            curl_setopt($request, $optionKey, $optValue);
+            $request->setopt($optionKey, $optValue);
         }
 
-        curl_setopt($request, CURLOPT_POSTFIELDS, $payload);
-        curl_setopt(
-            $request,
+        $request->setopt(CURLOPT_POSTFIELDS, $payload);
+        $request->setopt(
             CURLOPT_HTTPHEADER,
             [
                 'Content-Type: ' . $this->dataType,
@@ -76,17 +88,19 @@ class Curl
             ]
         );
 
-        if (!$this->body = curl_exec($request)) {
-            $this->error = curl_error($request);
+        if (!$this->body = $request->exec()) {
+            $this->error = $request->error();
         }
 
-        $info = curl_getinfo($request);
+        $info = $request->getinfo();
         $this->status = isset($info['http_code']) ? $info['http_code'] : null;
 
-        curl_close($request);
+        $request->close();
     }
 
     /**
+     * Gets the http response status of the last CURL request
+     *
      * @return string|null
      */
     public function getStatus()
@@ -95,6 +109,8 @@ class Curl
     }
 
     /**
+     * Gets the response body of the last CURL request
+     *
      * @return string|null
      */
     public function getBody()
@@ -103,6 +119,8 @@ class Curl
     }
 
     /**
+     * Gets the error string for the last CURL request
+     *
      * @return string|null
      */
     public function getError()
