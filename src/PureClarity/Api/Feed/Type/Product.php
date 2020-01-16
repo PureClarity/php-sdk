@@ -8,6 +8,11 @@ namespace PureClarity\Api\Feed\Type;
 
 use PureClarity\Api\Feed\Feed;
 
+/**
+ * Class Product
+ *
+ * Product Feed class - sets parameters required for the Product Feed
+ */
 class Product extends Feed
 {
     /** @var string $feedType */

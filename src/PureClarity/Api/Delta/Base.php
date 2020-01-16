@@ -10,7 +10,7 @@ use Exception;
 use PureClarity\Api\Resource\Endpoints;
 use PureClarity\Api\Transfer\Curl;
 
-class Base
+abstract class Base
 {
     /** @var string $accessKey */
     private $accessKey;
@@ -21,18 +21,26 @@ class Base
     /** @var string $region */
     private $region;
 
+    /** @var mixed[] $data */
+    private $data = [];
+
+    /** @var mixed[] $delete */
+    private $delete = [];
+
+    /** @var string $endpoint */
+    private $endpoint;
+
     /** @var string $dataKey */
     protected $dataKey;
 
     /** @var string $deleteKey */
     protected $deleteKey;
 
-    /** @var mixed[] $data */
-    private $data;
-
-    /** @var mixed[] $delete */
-    private $delete;
-
+    /**
+     * @param string $accessKey
+     * @param string $secretKey
+     * @param integer $region
+     */
     public function __construct($accessKey, $secretKey, $region)
     {
         $this->accessKey = $accessKey;
@@ -41,6 +49,8 @@ class Base
     }
 
     /**
+     * Adds a Delete Delta row
+     *
      * @param string $delete
      */
     public function addDelete($delete)
@@ -49,7 +59,9 @@ class Base
     }
 
     /**
-     * @param $data
+     * Adds a normal Delta Row
+     *
+     * @param mixed[] $data
      */
     public function addData($data)
     {
@@ -57,6 +69,8 @@ class Base
     }
 
     /**
+     * Builds a Base Request array
+     *
      * @return array
      */
     private function buildRequest()
@@ -71,15 +85,30 @@ class Base
     }
 
     /**
+     * Triggers the sending of the Delta data to PureClarity
+     *
+     * @return mixed[]
      * @throws Exception
      */
     public function send()
     {
-        $this->sendDeletes();
-        $this->sendData();
+        $responses = [];
+        if (count($this->delete) > 0) {
+            $responses[] = $this->sendDeletes();
+        }
+
+        if (count($this->data) > 0) {
+            $dataResponses = $this->sendData();
+            $responses = array_merge($responses, $dataResponses);
+        }
+
+        return $responses;
     }
 
     /**
+     * Handles sending just delete Deltas
+     *
+     * @return mixed[]
      * @throws Exception
      */
     private function sendDeletes()
@@ -87,58 +116,66 @@ class Base
         $request = $this->buildRequest();
         $request[$this->deleteKey] = $this->delete;
         $body = json_encode($request);
-        $this->sendDelta($body);
+        return $this->sendDelta($body);
     }
 
     /**
+     * Handles sending data Deltas, grouped into chunks of 10 so as not to hit the data limit
+     *
+     * @return mixed[]
      * @throws Exception
      */
     private function sendData()
     {
+        $responses = [];
         $requestBase = $this->buildRequest();
-
         $chunks = array_chunk($this->data, 10);
         foreach ($chunks as $data) {
             $request = $requestBase;
-            $request[$this->dataKey][] = $data;
+            $request[$this->dataKey] = $data;
             $body = json_encode($request);
-            $this->sendDelta($body);
+            $responses[] = $this->sendDelta($body);
         }
+
+        return $responses;
     }
 
     /**
+     * Sends the provided delta string to PureClarity
+     *
      * @param string $body
-     * @return array
+     * @return mixed[]
      * @throws Exception
      */
     private function sendDelta($body)
     {
         $url = $this->getDeltaEndpoint($this->region);
+
         $curl = new Curl();
         $curl->setDataType('application/json');
         $curl->post($url, $body);
 
-        var_dump($url, $body);
-
-        $error = $curl->getError();
-
-        if (empty($error) === false) {
-            throw new Exception($curl->getError());
-        }
-
         return [
             'status' => $curl->getStatus(),
-            'body' => $curl->getBody()
+            'body' => $curl->getBody(),
+            'error' => $curl->getError()
         ];
     }
 
     /**
+     * Gets the PureClarity Endpoint for deltas
+     *
      * @param string $region
      * @return string
      * @throws Exception
      */
     private function getDeltaEndpoint($region)
     {
-        return Endpoints::getDeltaEndpoint($region);
+        if ($this->endpoint === null) {
+            $endpoints = new Endpoints();
+            $this->endpoint = $endpoints->getDeltaEndpoint($region);
+        }
+
+        return $this->endpoint;
     }
 }

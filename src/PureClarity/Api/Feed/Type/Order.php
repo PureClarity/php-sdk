@@ -8,6 +8,11 @@ namespace PureClarity\Api\Feed\Type;
 
 use PureClarity\Api\Feed\Feed;
 
+/**
+ * Class Order
+ *
+ * Order Feed class - sets parameters required for the Order Feed
+ */
 class Order extends Feed
 {
     /** @var string $feedType */
@@ -37,8 +42,10 @@ class Order extends Feed
     protected $feedEnd = '';
 
     /**
-     * @param $orderData
-     * @return false|string
+     * Override of processData, so that we can accept multiple lines per order
+     *
+     * @param mixed[] $orderData
+     * @return string
      */
     public function processData($orderData)
     {
@@ -58,8 +65,10 @@ class Order extends Feed
     }
 
     /**
+     * Override of validate, so that we can validate multiple lines per order
+     *
      * @param mixed[] $orderData
-     * @return array
+     * @return string[]
      */
     protected function validate($orderData)
     {

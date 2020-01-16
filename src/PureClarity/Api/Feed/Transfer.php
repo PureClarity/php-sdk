@@ -10,6 +10,11 @@ use Exception;
 use PureClarity\Api\Resource\Endpoints;
 use PureClarity\Api\Transfer\Curl;
 
+/**
+ * Class Transfer
+ *
+ * Handles sending the  start / append / close of feed data
+ */
 class Transfer
 {
     /** @var string $feedType */
@@ -27,18 +32,25 @@ class Transfer
     /** @var string $feedId */
     private $feedId;
 
-    protected $problemFeeds = array();
-
-    public function __construct($feedType, $accessKey, $secretKey, $region)
+    /**
+     * @param string $feedType - Feed Type, used in naming of the feed file
+     * @param string $accessKey - Application Access Key
+     * @param string $secretKey - Application Secret Key
+     * @param integer $region - PureClarity Region ID
+     * @param string $feedId - Optional Feed ID, used in naming of the feed file
+     */
+    public function __construct($feedType, $accessKey, $secretKey, $region, $feedId = '')
     {
         $this->feedType  = $feedType;
         $this->accessKey = $accessKey;
         $this->secretKey = $secretKey;
         $this->region    = $region;
-        $this->feedId    = uniqid();
+        $this->feedId    = $feedId ?: uniqid();
     }
 
     /**
+     * Returns the current Feed ID
+     *
      * @return string
      */
     private function getFeedId()
@@ -49,33 +61,38 @@ class Transfer
     /**
      * Starts the feed by sending first bit of data to feed-create end point. For orders,
      * sends first row of CSV data, otherwise sends opening string of json.
-     * @param $data
+     *
+     * @param string $data
+     * @return mixed[]
      * @throws Exception
      */
     public function create($data)
     {
-        $this->send('feed-create', $data);
+        return $this->send('feed-create', $data);
     }
 
     /**
      * End the feed by sending any closing data to the feed-close end point. For order feeds,
      * no closing data is sent, the end point is simply called. For others, it's simply a closing
      * bracket.
-     * @param $data string character to close feed with
+     *
+     * @param string $data - character to close feed with
+     * @return mixed[]
      * @throws Exception
      */
     public function close($data)
     {
-        $this->send('feed-close', $data);
+        return $this->send('feed-close', $data);
     }
 
     /**
-     * @param $data
+     * @param string $data
+     * @return mixed[]
      * @throws Exception
      */
     public function append($data)
     {
-        $this->send('feed-append', $data);
+        return $this->send('feed-append', $data);
     }
 
     /**
@@ -83,8 +100,9 @@ class Transfer
      * so that each feed request is always treated uniquely on the server. For example,
      * you could have two people initialising feeds at the same time, which would otherwise
      * cause overlapping, corrupted data.
-     * @param $data string
-     * @return array
+     *
+     * @param string $data
+     * @return mixed[]
      */
     private function buildRequest($data)
     {
@@ -104,9 +122,12 @@ class Transfer
     }
 
     /**
+     * Sends the provided Data to the PureClarity SFTP endpoint
+     *
      * @param string $endPoint
      * @param string $data
-     * @return array
+     *
+     * @return mixed[]
      * @throws Exception
      */
     private function send($endPoint, $data)
@@ -115,10 +136,10 @@ class Transfer
         $url = $this->getSftpEndpoint($this->region) . $endPoint;
         $request = http_build_query($request);
 
-        echo "<pre>";
-        var_dump($url);
-        echo htmlentities(print_r($data, true));
-        echo "</pre>";
+        //echo "<pre>";
+        //var_dump($url);
+        //echo htmlentities(print_r($data, true));
+        //echo "</pre>";
 
         $curl = new Curl();
         $curl->setDataType('application/x-www-form-urlencoded');
@@ -127,7 +148,7 @@ class Transfer
         $error = $curl->getError();
 
         if (empty($error) === false) {
-            throw new Exception($curl->getError());
+            throw new Exception($error);
         }
 
         return [
@@ -137,12 +158,15 @@ class Transfer
     }
 
     /**
+     * Gets the PureClarity SFTP endpoint for the region provided
+     *
      * @param string $region
      * @return string
      * @throws Exception
      */
     private function getSftpEndpoint($region)
     {
-        return Endpoints::getSftpEndpoint($region);
+        $endpoints = new Endpoints();
+        return $endpoints->getSftpEndpoint($region);
     }
 }
