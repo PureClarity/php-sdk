@@ -38,7 +38,7 @@ class Client
     }
 
     /**
-     * Executs the CURL request using curl_exec and returns the response
+     * Executes the CURL request using curl_exec and returns the response
      *
      * @return bool|string
      */
