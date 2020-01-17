@@ -10,8 +10,16 @@ use Exception;
 use PureClarity\Api\Resource\Endpoints;
 use PureClarity\Api\Transfer\Curl;
 
+/**
+ * Class Base
+ *
+ * Base Delta class, handles core of Delta Sending
+ */
 abstract class Base
 {
+    /** @var Curl $curl */
+    private $curl;
+
     /** @var string $accessKey */
     private $accessKey;
 
@@ -151,8 +159,7 @@ abstract class Base
     {
         $url = $this->getDeltaEndpoint($this->region);
 
-        $curl = new Curl();
-        $curl->setDataType('application/json');
+        $curl = $this->getCurlHandler();
         $curl->post($url, $body);
 
         return [
@@ -177,5 +184,20 @@ abstract class Base
         }
 
         return $this->endpoint;
+    }
+
+    /**
+     * Gets the PureClarity Curl Handler
+     *
+     * @return Curl
+     */
+    private function getCurlHandler()
+    {
+        if ($this->curl === null) {
+            $this->curl = new Curl();
+            $this->curl->setDataType('application/json');
+        }
+
+        return $this->curl;
     }
 }
