@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit bootstrap = "src/autoload.php"
+         colors    = "true"
+         processIsolation = "true">
+
+    <testsuites>
+        <testsuite name="Unit Tests">
+            <directory>tests/unit/</directory>
+        </testsuite>
+    </testsuites>
+
+    <filter>
+        <whitelist>
+            <directory suffix=".php">src/PureClarity</directory>
+        </whitelist>
+    </filter>
+
+    <php>
+      <env name="PURECLARITY_HOST" value="127.0.0.1:1337" />
+      <env name="PURECLARITY_REGION" value="localhost" />
+      <env name="PURECLARITY_SCRIPT_URL" value="//localhost:3000/" />
+      <env name="PURECLARITY_SFTP_HOST" value="127.0.0.1" />
+      <env name="PURECLARITY_SFTP_PORT" value="2222" />
+      <env name="PURECLARITY_FEED_HOST" value="127.0.0.1" />
+      <env name="PURECLARITY_FEED_PORT" value="2223" />
+    </php>
+
+</phpunit>
