@@ -111,7 +111,7 @@ class ProductTest extends MockeryTestCase
             'Categories' => [],
             'Link' => 'url_to_product',
             'Image' => 'url_of_product_image',
-            'Prices' => []
+            'Prices' => ['10.00 GBP']
         ];
 
         $this->mockTransfer(false);
@@ -362,7 +362,7 @@ class ProductTest extends MockeryTestCase
             'Categories' => [],
             'Link' => 'url_to_product',
             'Image' => 'url_of_product_image',
-            'Prices' => []
+            'Prices' => ['10.00 GBP']
         ];
 
         $data = [];

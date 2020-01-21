@@ -32,7 +32,9 @@ class Product extends Feed
     protected $nonEmptyFields = [
         'Id',
         'Title',
-        'Link'
+        'Link',
+        'Image',
+        'Prices'
     ];
 
     /** @var string $feedStart */
