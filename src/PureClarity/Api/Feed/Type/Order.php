@@ -32,7 +32,11 @@ class Order extends Feed
 
     /** @var string[] $nonEmptyFields - Fields that must contain data */
     protected $nonEmptyFields = [
-        'OrderID'
+        'OrderID',
+        'ProdCode',
+        'Quantity',
+        'UnitPrice',
+        'LinePrice'
     ];
 
     /** @var string $feedStart */
