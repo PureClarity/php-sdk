@@ -27,7 +27,7 @@ class Endpoints
      *
      * @var string
      */
-    private $scriptUrl = '//pcs.pureclarity.net';
+    private $scriptUrl = '//pcs.pureclarity.net/';
 
     /**
      * Gets the PureClarity delta endpoint for the given region
@@ -75,12 +75,11 @@ class Endpoints
     public function getClientScriptUrl($accessKey)
     {
         $pureclarityScriptUrl = getenv('PURECLARITY_SCRIPT_URL');
-        if ($pureclarityScriptUrl !== null && $pureclarityScriptUrl !== '') {
-            $pureclarityScriptUrl .= $accessKey . '/dev.js';
-            return $pureclarityScriptUrl;
-        } else {
-            $pureclarityScriptUrl = $this->scriptUrl . '/' . $accessKey . '/cs.js';
+        if ($pureclarityScriptUrl === null || $pureclarityScriptUrl === '') {
+            $pureclarityScriptUrl = $this->scriptUrl;
         }
+
+        $pureclarityScriptUrl .= $accessKey . '/cs.js';
 
         return $pureclarityScriptUrl;
     }
@@ -120,12 +119,7 @@ class Endpoints
     {
         $regionData = $this->getRegion($region);
         $host = getenv('PURECLARITY_HOST');
-        if ($host != null && $host != '') {
-            $parsed = parse_url($host);
-            if (empty($parsed['scheme'])) {
-                $host = 'http://' . $host;
-            }
-        } else {
+        if ($host === null || $host === '') {
             $host = $regionData['endpoints']['api'];
         }
 

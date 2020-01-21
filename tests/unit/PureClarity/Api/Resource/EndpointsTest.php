@@ -88,12 +88,12 @@ class EndpointsTest extends MockeryTestCase
      */
     public function testGetDeltaEndpoint()
     {
-        putenv('PURECLARITY_HOST=127.0.0.1');
+        putenv('PURECLARITY_HOST=http://127.0.0.1');
         $this->mockRegions();
         $endpoint = $this->subject->getDeltaEndpoint(1);
 
         $this->assertEquals(
-            'http://' . getenv('PURECLARITY_HOST') . '/api/productdelta',
+            getenv('PURECLARITY_HOST') . '/api/productdelta',
             $endpoint
         );
     }
@@ -120,12 +120,12 @@ class EndpointsTest extends MockeryTestCase
      */
     public function testGetSignupRequestEndpoint()
     {
-        putenv('PURECLARITY_HOST=127.0.0.1');
+        putenv('PURECLARITY_HOST=http://127.0.0.1');
         $this->mockRegions();
         $endpoint = $this->subject->getSignupRequestEndpoint(1);
 
         $this->assertEquals(
-            'http://' . getenv('PURECLARITY_HOST') . '/api/plugin/signuprequest',
+            getenv('PURECLARITY_HOST') . '/api/plugin/signuprequest',
             $endpoint
         );
     }
@@ -152,12 +152,12 @@ class EndpointsTest extends MockeryTestCase
      */
     public function testGetSignupStatusEndpoint()
     {
-        putenv('PURECLARITY_HOST=127.0.0.1');
+        putenv('PURECLARITY_HOST=http://127.0.0.1');
         $this->mockRegions();
         $endpoint = $this->subject->getSignupStatusEndpoint(1);
 
         $this->assertEquals(
-            'http://' . getenv('PURECLARITY_HOST') . '/api/plugin/signupstatus',
+            getenv('PURECLARITY_HOST') . '/api/plugin/signupstatus',
             $endpoint
         );
     }
@@ -189,7 +189,7 @@ class EndpointsTest extends MockeryTestCase
         $endpoint = $this->subject->getClientScriptUrl('ABCDEFG');
 
         $this->assertEquals(
-            getenv('PURECLARITY_SCRIPT_URL') . 'ABCDEFG/dev.js',
+            getenv('PURECLARITY_SCRIPT_URL') . 'ABCDEFG/cs.js',
             $endpoint
         );
     }
