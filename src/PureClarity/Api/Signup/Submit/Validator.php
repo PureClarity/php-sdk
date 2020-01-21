@@ -148,7 +148,7 @@ class Validator
     {
         // check password is strong enough
         if (isset($params[Submit::PARAM_PASSWORD]) &&
-            !preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})/', $params[Submit::PARAM_PASSWORD])
+            !preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,}$/', $params[Submit::PARAM_PASSWORD])
         ) {
             $this->errors[] = 'Password not strong enough, must contain 1 lowercase letter,'
                             . ' 1 uppercase letter, 1 number and be 8 characters or longer';
