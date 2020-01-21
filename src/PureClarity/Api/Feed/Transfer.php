@@ -136,11 +136,6 @@ class Transfer
         $url = $this->getSftpEndpoint($this->region) . $endPoint;
         $request = http_build_query($request);
 
-        //echo "<pre>";
-        //var_dump($url);
-        //echo htmlentities(print_r($data, true));
-        //echo "</pre>";
-
         $curl = new Curl();
         $curl->setDataType('application/x-www-form-urlencoded');
         $curl->post($url, $request);
