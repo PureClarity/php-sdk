@@ -164,11 +164,13 @@ abstract class Base
 
         $status = $curl->getStatus();
         $error = $curl->getError();
+        $body = $curl->getBody();
 
         if ($status !== 200) {
             throw new Exception(
-                'Error: HTTP ' . $status . ' Response ' .
-                'Message: ' . $error
+                'Error: HTTP ' . $status . ' Response | ' .
+                'Error Message: ' . $error . ' | ' .
+                'Body: ' . $body
             );
         }
 
@@ -180,7 +182,7 @@ abstract class Base
 
         return [
             'status' => $status,
-            'body' => $curl->getBody()
+            'body' => $body
         ];
     }
 

@@ -274,7 +274,7 @@ class ProductTest extends MockeryTestCase
             $this->subject->send();
         } catch (Exception $e) {
             $this->assertEquals(
-                'Error: HTTP 500 Response Message: Some error',
+                'Error: HTTP 500 Response | Error Message: Some error | Body: ',
                 $e->getMessage()
             );
         }
@@ -302,7 +302,7 @@ class ProductTest extends MockeryTestCase
             $this->subject->send();
         } catch (Exception $e) {
             $this->assertEquals(
-                'Error: HTTP 500 Response Message: Some error',
+                'Error: HTTP 500 Response | Error Message: Some error | Body: ',
                 $e->getMessage()
             );
         }
@@ -385,11 +385,9 @@ class ProductTest extends MockeryTestCase
             ->times($pages)
             ->andReturn($error);
 
-        if (empty($error) || $statusCode === 200) {
-            $curl->shouldReceive('getBody')
-                ->times($pages)
-                ->andReturn($response);
-        }
+        $curl->shouldReceive('getBody')
+            ->times($pages)
+            ->andReturn($response);
 
 
 
