@@ -142,11 +142,13 @@ class Transfer
 
         $status = $curl->getStatus();
         $error = $curl->getError();
+        $body = $curl->getBody();
 
         if ($status !== 200) {
             throw new Exception(
-                'Error: HTTP ' . $status . ' Response ' .
-                'Message: ' . $error
+                'Error: HTTP ' . $status . ' Response | ' .
+                'Message: ' . $error . ' | ' .
+                'Body: ' . $body . ' | '
             );
         }
 
@@ -156,7 +158,7 @@ class Transfer
 
         return [
             'status' => $status,
-            'body' => $curl->getBody()
+            'body' => $body
         ];
     }
 

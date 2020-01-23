@@ -193,6 +193,27 @@ class TransferTest extends MockeryTestCase
     }
 
     /**
+     * Tests that an exception is thrown when the Curl returns an error
+     */
+    public function testHttpError()
+    {
+        $this->mockEndpoint();
+        $this->mockCurl('feed-create', '{"Version": 2, "Products":[', '', 400, 'An Error');
+
+        $error = '';
+        try {
+            $this->subject->create('{"Version": 2, "Products":[');
+        } catch (Exception $e) {
+            $error = $e->getMessage();
+        }
+
+        $this->assertEquals(
+            'Error: HTTP 400 Response | Message: An Error | Body:  | ',
+            $error
+        );
+    }
+
+    /**
      * Mocks the Curl class
      *
      * @see \PureClarity\Api\Transfer\Curl
@@ -223,11 +244,9 @@ class TransferTest extends MockeryTestCase
                 ->times(1)
                 ->andReturn($error);
 
-            if (empty($error)) {
-                $client->shouldReceive('getBody')
-                    ->times(1)
-                    ->andReturn($body);
-            }
+            $client->shouldReceive('getBody')
+                ->times(1)
+                ->andReturn($body);
         } else {
             $client->shouldReceive('post')
                 ->with($url, $postBody)
