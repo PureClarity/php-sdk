@@ -162,10 +162,25 @@ abstract class Base
         $curl = $this->getCurlHandler();
         $curl->post($url, $body);
 
+        $status = $curl->getStatus();
+        $error = $curl->getError();
+
+        if ($status !== 200) {
+            throw new Exception(
+                'Error: HTTP ' . $status . ' Response ' .
+                'Message: ' . $error
+            );
+        }
+
+        if ($error) {
+            throw new Exception(
+                'Error: ' . $error
+            );
+        }
+
         return [
-            'status' => $curl->getStatus(),
-            'body' => $curl->getBody(),
-            'error' => $curl->getError()
+            'status' => $status,
+            'body' => $curl->getBody()
         ];
     }
 

@@ -67,8 +67,7 @@ class ProductTest extends MockeryTestCase
         $this->assertEquals(
             [
                 'status' => 200,
-                'body' => '',
-                'error' => ''
+                'body' => ''
             ],
             $responses[0]
         );
@@ -99,8 +98,7 @@ class ProductTest extends MockeryTestCase
         $this->assertEquals(
             [
                 'status' => 200,
-                'body' => '',
-                'error' => ''
+                'body' => ''
             ],
             $responses[0]
         );
@@ -142,8 +140,7 @@ class ProductTest extends MockeryTestCase
         $this->assertEquals(
             [
                 'status' => 200,
-                'body' => '',
-                'error' => ''
+                'body' => ''
             ],
             $responses[0]
         );
@@ -151,8 +148,7 @@ class ProductTest extends MockeryTestCase
         $this->assertEquals(
             [
                 'status' => 200,
-                'body' => '',
-                'error' => ''
+                'body' => ''
             ],
             $responses[1]
         );
@@ -218,8 +214,7 @@ class ProductTest extends MockeryTestCase
         $this->assertEquals(
             [
                 'status' => 200,
-                'body' => '',
-                'error' => ''
+                'body' => ''
             ],
             $responses[0]
         );
@@ -227,8 +222,7 @@ class ProductTest extends MockeryTestCase
         $this->assertEquals(
             [
                 'status' => 200,
-                'body' => '',
-                'error' => ''
+                'body' => ''
             ],
             $responses[1]
         );
@@ -275,19 +269,15 @@ class ProductTest extends MockeryTestCase
         $this->mockEndpoint();
         $this->mockCurl($expectedBody, 500, '', 'Some error');
 
-        $this->subject->addData(['SKU' => 'test123']);
-        $responses = $this->subject->send();
-
-        $this->assertEquals(1, count($responses));
-
-        $this->assertEquals(
-            [
-                'status' => 500,
-                'body' => '',
-                'error' => 'Some error'
-            ],
-            $responses[0]
-        );
+        try {
+            $this->subject->addData(['SKU' => 'test123']);
+            $this->subject->send();
+        } catch (Exception $e) {
+            $this->assertEquals(
+                'Error: HTTP 500 Response Message: Some error',
+                $e->getMessage()
+            );
+        }
     }
 
     /**
@@ -305,21 +295,17 @@ class ProductTest extends MockeryTestCase
         );
 
         $this->mockEndpoint();
-        $this->mockCurl($expectedBody, 400, 'Permission Denied');
+        $this->mockCurl($expectedBody, 200, 'An error response');
 
-        $this->subject->addData(['SKU' => 'test123']);
-        $responses = $this->subject->send();
-
-        $this->assertEquals(1, count($responses));
-
-        $this->assertEquals(
-            [
-                'status' => 400,
-                'body' => 'Permission Denied',
-                'error' => ''
-            ],
-            $responses[0]
-        );
+        try {
+            $this->subject->addData(['SKU' => 'test123']);
+            $this->subject->send();
+        } catch (Exception $e) {
+            $this->assertEquals(
+                'Error: HTTP 500 Response Message: Some error',
+                $e->getMessage()
+            );
+        }
     }
 
     /**
@@ -391,17 +377,21 @@ class ProductTest extends MockeryTestCase
             ->with('http://127.0.0.1/delta/', $requestBody)
             ->times(1);
 
-        $curl->shouldReceive('getError')
-            ->times($pages)
-            ->andReturn($error);
-
         $curl->shouldReceive('getStatus')
             ->times($pages)
             ->andReturn($statusCode);
 
-        $curl->shouldReceive('getBody')
+        $curl->shouldReceive('getError')
             ->times($pages)
-            ->andReturn($response);
+            ->andReturn($error);
+
+        if (empty($error) || $statusCode === 200) {
+            $curl->shouldReceive('getBody')
+                ->times($pages)
+                ->andReturn($response);
+        }
+
+
 
         return $curl;
     }

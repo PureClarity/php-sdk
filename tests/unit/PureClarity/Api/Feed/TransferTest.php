@@ -215,6 +215,10 @@ class TransferTest extends MockeryTestCase
                 ->with($url, $postBody)
                 ->times(1);
 
+            $client->shouldReceive('getStatus')
+                ->times(1)
+                ->andReturn($status);
+
             $client->shouldReceive('getError')
                 ->times(1)
                 ->andReturn($error);
@@ -223,10 +227,6 @@ class TransferTest extends MockeryTestCase
                 $client->shouldReceive('getBody')
                     ->times(1)
                     ->andReturn($body);
-
-                $client->shouldReceive('getStatus')
-                    ->times(1)
-                    ->andReturn($status);
             }
         } else {
             $client->shouldReceive('post')
