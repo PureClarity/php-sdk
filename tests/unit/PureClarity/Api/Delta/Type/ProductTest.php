@@ -235,6 +235,7 @@ class ProductTest extends MockeryTestCase
      */
     public function testInvalidRegion()
     {
+        $error = '';
         try {
             $this->mockEndpoint('Invalid Region supplied');
             $test = new Product(
@@ -245,11 +246,13 @@ class ProductTest extends MockeryTestCase
             $test->addData(['SKU' => 'test123']);
             $test->send();
         } catch (Exception $e) {
-            $this->assertEquals(
-                'Invalid Region supplied',
-                $e->getMessage()
-            );
+            $error = $e->getMessage();
         }
+
+        $this->assertEquals(
+            'Invalid Region supplied',
+            $error
+        );
     }
 
     /**
@@ -269,15 +272,18 @@ class ProductTest extends MockeryTestCase
         $this->mockEndpoint();
         $this->mockCurl($expectedBody, 500, '', 'Some error');
 
+        $error = '';
         try {
             $this->subject->addData(['SKU' => 'test123']);
             $this->subject->send();
         } catch (Exception $e) {
-            $this->assertEquals(
-                'Error: HTTP 500 Response | Error Message: Some error | Body: ',
-                $e->getMessage()
-            );
+            $error = $e->getMessage();
         }
+
+        $this->assertEquals(
+            'Error: HTTP 500 Response | Error Message: Some error | Body: ',
+            $error
+        );
     }
 
     /**
@@ -297,15 +303,23 @@ class ProductTest extends MockeryTestCase
         $this->mockEndpoint();
         $this->mockCurl($expectedBody, 200, 'An error response');
 
+        $error = '';
         try {
             $this->subject->addData(['SKU' => 'test123']);
-            $this->subject->send();
-        } catch (Exception $e) {
+            $response = $this->subject->send();
+
             $this->assertEquals(
-                'Error: HTTP 500 Response | Error Message: Some error | Body: ',
-                $e->getMessage()
+                'An error response',
+                $response[0]['body']
             );
+        } catch (Exception $e) {
+            $error = $e->getMessage();
         }
+
+        $this->assertEquals(
+            '',
+            $error
+        );
     }
 
     /**
@@ -388,8 +402,6 @@ class ProductTest extends MockeryTestCase
         $curl->shouldReceive('getBody')
             ->times($pages)
             ->andReturn($response);
-
-
 
         return $curl;
     }
