@@ -67,8 +67,7 @@ class ProductTest extends MockeryTestCase
         $this->assertEquals(
             [
                 'status' => 200,
-                'body' => '',
-                'error' => ''
+                'body' => ''
             ],
             $responses[0]
         );
@@ -99,8 +98,7 @@ class ProductTest extends MockeryTestCase
         $this->assertEquals(
             [
                 'status' => 200,
-                'body' => '',
-                'error' => ''
+                'body' => ''
             ],
             $responses[0]
         );
@@ -142,8 +140,7 @@ class ProductTest extends MockeryTestCase
         $this->assertEquals(
             [
                 'status' => 200,
-                'body' => '',
-                'error' => ''
+                'body' => ''
             ],
             $responses[0]
         );
@@ -151,8 +148,7 @@ class ProductTest extends MockeryTestCase
         $this->assertEquals(
             [
                 'status' => 200,
-                'body' => '',
-                'error' => ''
+                'body' => ''
             ],
             $responses[1]
         );
@@ -218,8 +214,7 @@ class ProductTest extends MockeryTestCase
         $this->assertEquals(
             [
                 'status' => 200,
-                'body' => '',
-                'error' => ''
+                'body' => ''
             ],
             $responses[0]
         );
@@ -227,8 +222,7 @@ class ProductTest extends MockeryTestCase
         $this->assertEquals(
             [
                 'status' => 200,
-                'body' => '',
-                'error' => ''
+                'body' => ''
             ],
             $responses[1]
         );
@@ -241,6 +235,7 @@ class ProductTest extends MockeryTestCase
      */
     public function testInvalidRegion()
     {
+        $error = '';
         try {
             $this->mockEndpoint('Invalid Region supplied');
             $test = new Product(
@@ -251,11 +246,13 @@ class ProductTest extends MockeryTestCase
             $test->addData(['SKU' => 'test123']);
             $test->send();
         } catch (Exception $e) {
-            $this->assertEquals(
-                'Invalid Region supplied',
-                $e->getMessage()
-            );
+            $error = $e->getMessage();
         }
+
+        $this->assertEquals(
+            'Invalid Region supplied',
+            $error
+        );
     }
 
     /**
@@ -275,18 +272,17 @@ class ProductTest extends MockeryTestCase
         $this->mockEndpoint();
         $this->mockCurl($expectedBody, 500, '', 'Some error');
 
-        $this->subject->addData(['SKU' => 'test123']);
-        $responses = $this->subject->send();
-
-        $this->assertEquals(1, count($responses));
+        $error = '';
+        try {
+            $this->subject->addData(['SKU' => 'test123']);
+            $this->subject->send();
+        } catch (Exception $e) {
+            $error = $e->getMessage();
+        }
 
         $this->assertEquals(
-            [
-                'status' => 500,
-                'body' => '',
-                'error' => 'Some error'
-            ],
-            $responses[0]
+            'Error: HTTP 500 Response | Error Message: Some error | Body: ',
+            $error
         );
     }
 
@@ -305,20 +301,24 @@ class ProductTest extends MockeryTestCase
         );
 
         $this->mockEndpoint();
-        $this->mockCurl($expectedBody, 400, 'Permission Denied');
+        $this->mockCurl($expectedBody, 200, 'An error response');
 
-        $this->subject->addData(['SKU' => 'test123']);
-        $responses = $this->subject->send();
+        $error = '';
+        try {
+            $this->subject->addData(['SKU' => 'test123']);
+            $response = $this->subject->send();
 
-        $this->assertEquals(1, count($responses));
+            $this->assertEquals(
+                'An error response',
+                $response[0]['body']
+            );
+        } catch (Exception $e) {
+            $error = $e->getMessage();
+        }
 
         $this->assertEquals(
-            [
-                'status' => 400,
-                'body' => 'Permission Denied',
-                'error' => ''
-            ],
-            $responses[0]
+            '',
+            $error
         );
     }
 
@@ -391,13 +391,13 @@ class ProductTest extends MockeryTestCase
             ->with('http://127.0.0.1/delta/', $requestBody)
             ->times(1);
 
-        $curl->shouldReceive('getError')
-            ->times($pages)
-            ->andReturn($error);
-
         $curl->shouldReceive('getStatus')
             ->times($pages)
             ->andReturn($statusCode);
+
+        $curl->shouldReceive('getError')
+            ->times($pages)
+            ->andReturn($error);
 
         $curl->shouldReceive('getBody')
             ->times($pages)

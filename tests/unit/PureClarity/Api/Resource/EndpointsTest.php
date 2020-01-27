@@ -65,6 +65,7 @@ class EndpointsTest extends MockeryTestCase
      */
     public function testInvalidRegion()
     {
+        $error = '';
         try {
             $regions = m::mock('overload:PureClarity\Api\Resource\Regions');
 
@@ -75,11 +76,13 @@ class EndpointsTest extends MockeryTestCase
             
             $this->subject->getDeltaEndpoint('error');
         } catch (Exception $e) {
-            $this->assertEquals(
-                'Invalid Region supplied',
-                $e->getMessage()
-            );
+            $error = $e->getMessage();
         }
+
+        $this->assertEquals(
+            'Invalid Region supplied',
+            $error
+        );
     }
 
     /**

@@ -140,15 +140,25 @@ class Transfer
         $curl->setDataType('application/x-www-form-urlencoded');
         $curl->post($url, $request);
 
+        $status = $curl->getStatus();
         $error = $curl->getError();
+        $body = $curl->getBody();
+
+        if ($status !== 200) {
+            throw new Exception(
+                'Error: HTTP ' . $status . ' Response | ' .
+                'Message: ' . $error . ' | ' .
+                'Body: ' . $body . ' | '
+            );
+        }
 
         if (empty($error) === false) {
             throw new Exception($error);
         }
 
         return [
-            'status' => $curl->getStatus(),
-            'body' => $curl->getBody()
+            'status' => $status,
+            'body' => $body
         ];
     }
 
