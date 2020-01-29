@@ -34,15 +34,7 @@ class Regions
                 'api' => 'https://api-us-e-1.pureclarity.net',
                 'sftp' => 'https://sftp-us-e-1.pureclarity.net',
             ]
-        ],
-        99 => [
-            'label' => 'UK',
-            'name' => 'uk',
-            'endpoints' => [
-                'api' => 'https://api-eu-w-1.pureclarity.net',
-                'sftp' => 'https://sftp-eu-w-1.pureclarity.net',
-            ]
-        ],
+        ]
     ];
 
     /**
