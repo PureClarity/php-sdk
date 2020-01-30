@@ -75,7 +75,7 @@ class Endpoints
     public function getClientScriptUrl($accessKey)
     {
         $pureclarityScriptUrl = getenv('PURECLARITY_SCRIPT_URL');
-        if ($pureclarityScriptUrl === null || $pureclarityScriptUrl === '') {
+        if (empty($pureclarityScriptUrl)) {
             $pureclarityScriptUrl = $this->scriptUrl;
         }
 
@@ -119,7 +119,7 @@ class Endpoints
     {
         $regionData = $this->getRegion($region);
         $host = getenv('PURECLARITY_HOST');
-        if ($host === null || $host === '') {
+        if (empty($host)) {
             $host = $regionData['endpoints']['api'];
         }
 
