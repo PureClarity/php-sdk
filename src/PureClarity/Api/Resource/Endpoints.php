@@ -42,6 +42,18 @@ class Endpoints
     }
 
     /**
+     * Gets the PureClarity delete endpoint for the given region
+     *
+     * @param integer $region
+     * @return string
+     * @throws Exception
+     */
+    public function getDeleteEndpoint($region)
+    {
+        return $this->getApiUrl($region) . '/api/plugin/delete';
+    }
+
+    /**
      * Gets the PureClarity feedback endpoint for the given region
      *
      * @param integer $region
