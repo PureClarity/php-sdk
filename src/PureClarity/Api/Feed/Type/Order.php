@@ -55,14 +55,14 @@ class Order extends Feed
     {
         $data = '';
         foreach ($orderData as $orderLine) {
-            $data .= $orderLine['OrderID'] . ',' .
+            $data .= PHP_EOL . $orderLine['OrderID'] . ',' .
                      $orderLine['UserId'] . ',' .
                      $orderLine['Email'] . ',' .
                      $orderLine['DateTime'] . ',' .
                      $orderLine['ProdCode'] . ',' .
                      $orderLine['Quantity'] . ',' .
                      $orderLine['UnitPrice'] . ',' .
-                     $orderLine['LinePrice'] . PHP_EOL;
+                     $orderLine['LinePrice'];
         }
 
         return $data;
