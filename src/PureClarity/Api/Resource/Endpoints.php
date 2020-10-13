@@ -42,6 +42,18 @@ class Endpoints
     }
 
     /**
+     * Gets the PureClarity next steps completion endpoint for the given region
+     *
+     * @param integer $region
+     * @return string
+     * @throws Exception
+     */
+    public function getNextStepsCompleteEndpoint($region)
+    {
+        return $this->getApiUrl($region) . '/api/next-steps/complete';
+    }
+
+    /**
      * Gets the PureClarity delta endpoint for the given region
      *
      * @param integer $region

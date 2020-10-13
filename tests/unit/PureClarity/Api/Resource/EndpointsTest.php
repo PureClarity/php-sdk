@@ -118,6 +118,38 @@ class EndpointsTest extends MockeryTestCase
     }
 
     /**
+     * Tests that the Next Steps Complete endpoint is returned correctly - with env variable set to override the real value
+     * @throws Exception
+     */
+    public function testGetNextStepsCompleteEndpoint()
+    {
+        putenv('PURECLARITY_HOST=http://127.0.0.1');
+        $this->mockRegions();
+        $endpoint = $this->subject->getNextStepsCompleteEndpoint(1);
+
+        $this->assertEquals(
+            getenv('PURECLARITY_HOST') . '/api/next-steps/complete',
+            $endpoint
+        );
+    }
+
+    /**
+     * Tests that the Next Steps Complete endpoint is returned correctly - with env set to empty so it returns a real value
+     * @throws Exception
+     */
+    public function testGetNextStepsCompleteEndpointReal()
+    {
+        putenv('PURECLARITY_HOST=');
+        $this->mockRegions();
+        $endpoint = $this->subject->getNextStepsCompleteEndpoint(1);
+
+        $this->assertEquals(
+            self::EU_ENDPOINT_URL . '/api/next-steps/complete',
+            $endpoint
+        );
+    }
+
+    /**
      * Tests that the Delta endpoint is returned correctly - with env variable set to override the real value
      * @throws Exception
      */
