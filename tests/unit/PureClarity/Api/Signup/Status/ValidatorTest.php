@@ -46,6 +46,8 @@ class ValidatorTest extends MockeryTestCase
 
     /**
      * Tests that a fully valid set of parameters gets handled correctly
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
      */
     public function testValid()
     {
@@ -64,6 +66,8 @@ class ValidatorTest extends MockeryTestCase
 
     /**
      * Tests that a fully missing set of parameters gets handled correctly
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
      */
     public function testMissing()
     {
@@ -79,6 +83,8 @@ class ValidatorTest extends MockeryTestCase
 
     /**
      * Tests that an invalid region gets handled correctly
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
      */
     public function testInvalidRegion()
     {

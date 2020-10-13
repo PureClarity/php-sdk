@@ -81,6 +81,8 @@ class RequestorTest extends MockeryTestCase
 
     /**
      * Test that a successful send gets handled correctly
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
      * @throws Exception
      */
     public function testSuccessfulSend()
@@ -105,6 +107,8 @@ class RequestorTest extends MockeryTestCase
 
     /**
      * Test that a send that gets an error response gets handled correctly
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
      * @throws Exception
      */
     public function testErrorSend()
@@ -129,6 +133,8 @@ class RequestorTest extends MockeryTestCase
 
     /**
      * Test that a send that results in an exception gets handled correctly
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
      * @throws Exception
      */
     public function testException()
