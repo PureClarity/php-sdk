@@ -100,6 +100,37 @@ class UserTest extends MockeryTestCase
     }
 
     /**
+     * Tests attempting to append bad data returns the correct type-specific errors
+     */
+    public function testAppendEmpty()
+    {
+        $this->mockTransfer(false);
+
+        $data = [
+            '_index' => '',
+            'UserId' => ''
+        ];
+
+        $subject = new User(
+            self::ACCESS_KEY,
+            self::SECRET_KEY,
+            self::REGION
+        );
+
+        $error = '';
+        try {
+            $subject->append($data);
+        } catch (Exception $e) {
+            $error = $e->getMessage();
+        }
+
+        $this->assertEquals(
+            'Missing data for UserId',
+            $error
+        );
+    }
+
+    /**
      * Tests that a single append does not send data (as default page size is 50)
      */
     public function testAppendValidNotSent()

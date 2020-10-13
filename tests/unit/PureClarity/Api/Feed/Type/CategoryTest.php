@@ -100,6 +100,42 @@ class CategoryTest extends MockeryTestCase
     }
 
     /**
+     * Tests attempting to append bad data returns the correct type-specific errors
+     */
+    public function testAppendEmpty()
+    {
+        $data = [
+            '_index' => '',
+            'Id' => '',
+            'DisplayName' => '',
+            'Image' => '',
+            'Description' => '',
+            'Link' => '',
+            'ParentIds' => [],
+        ];
+
+        $this->mockTransfer(false);
+
+        $subject = new Category(
+            self::ACCESS_KEY,
+            self::SECRET_KEY,
+            self::REGION
+        );
+
+        $error = '';
+        try {
+            $subject->append($data);
+        } catch (Exception $e) {
+            $error = $e->getMessage();
+        }
+
+        $this->assertEquals(
+            'Missing data for Id|Missing data for DisplayName|Missing data for Link',
+            $error
+        );
+    }
+
+    /**
      * Tests that a single append does not send data (as default page size is 50)
      */
     public function testAppendValidNotSent()

@@ -100,6 +100,40 @@ class BrandTest extends MockeryTestCase
     }
 
     /**
+     * Tests attempting to append empty bad data returns the correct type-specific errors
+     */
+    public function testAppendInvalidNonEmpty()
+    {
+        $this->mockTransfer(false);
+
+        $data = [
+            'Id' => '',
+            'DisplayName' => '',
+            'Image' => '',
+            'Description' => '',
+            'Link' => '',
+        ];
+
+        $subject = new Brand(
+            self::ACCESS_KEY,
+            self::SECRET_KEY,
+            self::REGION
+        );
+
+        $error = '';
+        try {
+            $subject->append($data);
+        } catch (Exception $e) {
+            $error = $e->getMessage();
+        }
+
+        $this->assertEquals(
+            'Missing data for Id|Missing data for DisplayName',
+            $error
+        );
+    }
+
+    /**
      * Tests that a single append does not send data (as default page size is 50)
      */
     public function testAppendValidNotSent()
