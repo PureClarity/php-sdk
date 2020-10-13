@@ -30,6 +30,18 @@ class Endpoints
     private $scriptUrl = '//pcs.pureclarity.net/';
 
     /**
+     * Gets the PureClarity dashboard endpoint for the given region
+     *
+     * @param integer $region
+     * @return string
+     * @throws Exception
+     */
+    public function getDashboardEndpoint($region)
+    {
+        return $this->getApiUrl($region) . '/api/plugin/dashboard';
+    }
+
+    /**
      * Gets the PureClarity delta endpoint for the given region
      *
      * @param integer $region
