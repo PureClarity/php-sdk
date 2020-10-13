@@ -30,6 +30,54 @@ class Endpoints
     private $scriptUrl = '//pcs.pureclarity.net/';
 
     /**
+     * Gets the PureClarity dashboard endpoint for the given region
+     *
+     * @param integer $region
+     * @return string
+     * @throws Exception
+     */
+    public function getDashboardEndpoint($region)
+    {
+        return $this->getApiUrl($region) . '/api/plugin/dashboard';
+    }
+
+    /**
+     * Gets the PureClarity delete endpoint for the given region
+     *
+     * @param integer $region
+     * @return string
+     * @throws Exception
+     */
+    public function getDeleteEndpoint($region)
+    {
+        return $this->getApiUrl($region) . '/api/plugin/delete';
+    }
+
+    /**
+     * Gets the PureClarity feedback endpoint for the given region
+     *
+     * @param integer $region
+     * @return string
+     * @throws Exception
+     */
+    public function getFeedbackEndpoint($region)
+    {
+        return $this->getApiUrl($region) . '/api/plugin/feedback';
+    }
+
+    /**
+     * Gets the PureClarity next steps completion endpoint for the given region
+     *
+     * @param integer $region
+     * @return string
+     * @throws Exception
+     */
+    public function getNextStepsCompleteEndpoint($region)
+    {
+        return $this->getApiUrl($region) . '/api/next-steps/complete';
+    }
+
+    /**
      * Gets the PureClarity delta endpoint for the given region
      *
      * @param integer $region

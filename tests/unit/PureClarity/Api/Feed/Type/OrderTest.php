@@ -101,6 +101,44 @@ class OrderTest extends MockeryTestCase
     }
 
     /**
+     * Tests attempting to append bad data returns the correct type-specific errors
+     */
+    public function testAppendEmpty()
+    {
+        $this->mockTransfer(false);
+
+        $data = [
+            'OrderID' => '',
+            'UserId' => '',
+            'Email' => '',
+            'DateTime' => '',
+            'ProdCode' => '',
+            'Quantity' => '',
+            'UnitPrice' => '',
+            'LinePrice' => ''
+        ];
+
+        $subject = new Order(
+            self::ACCESS_KEY,
+            self::SECRET_KEY,
+            self::REGION
+        );
+
+        $error = '';
+        try {
+            $subject->append([$data]);
+        } catch (Exception $e) {
+            $error = $e->getMessage();
+        }
+
+        $this->assertEquals(
+            'Missing data for OrderID|Missing data for ProdCode|Missing data for Quantity|'
+            . 'Missing data for UnitPrice|Missing data for LinePrice',
+            $error
+        );
+    }
+
+    /**
      * Tests that a single append does not send data (as default page size is 50)
      */
     public function testAppendValidNotSent()
@@ -383,14 +421,14 @@ class OrderTest extends MockeryTestCase
 
         for ($i = $start; $i <= $end; $i++) {
             $baseData['OrderID'] = $i;
-            $dataString .= $baseData['OrderID'] . ',' .
+            $dataString .= PHP_EOL . $baseData['OrderID'] . ',' .
                 $baseData['UserId'] . ',' .
                 $baseData['Email'] . ',' .
                 $baseData['DateTime'] . ',' .
                 $baseData['ProdCode'] . ',' .
                 $baseData['Quantity'] . ',' .
                 $baseData['UnitPrice'] . ',' .
-                $baseData['LinePrice'] . PHP_EOL;
+                $baseData['LinePrice'];
             $data[] = $baseData;
         }
 

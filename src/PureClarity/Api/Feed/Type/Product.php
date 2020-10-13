@@ -33,7 +33,6 @@ class Product extends Feed
         'Id',
         'Title',
         'Link',
-        'Image',
         'Prices'
     ];
 
