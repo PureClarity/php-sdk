@@ -118,6 +118,38 @@ class EndpointsTest extends MockeryTestCase
     }
 
     /**
+     * Tests that the Feedback endpoint is returned correctly - with env variable set to override the real value
+     * @throws Exception
+     */
+    public function testGetFeedbackEndpoint()
+    {
+        putenv('PURECLARITY_HOST=http://127.0.0.1');
+        $this->mockRegions();
+        $endpoint = $this->subject->getFeedbackEndpoint(1);
+
+        $this->assertEquals(
+            getenv('PURECLARITY_HOST') . '/api/plugin/feedback',
+            $endpoint
+        );
+    }
+
+    /**
+     * Tests that the Feedback endpoint is returned correctly - with env set to empty so it returns a real value
+     * @throws Exception
+     */
+    public function testGetFeedbackEndpointReal()
+    {
+        putenv('PURECLARITY_HOST=');
+        $this->mockRegions();
+        $endpoint = $this->subject->getFeedbackEndpoint(1);
+
+        $this->assertEquals(
+            self::EU_ENDPOINT_URL . '/api/plugin/feedback',
+            $endpoint
+        );
+    }
+
+    /**
      * Tests that the Next Steps Complete endpoint is returned correctly - with env variable set to override the real value
      * @throws Exception
      */

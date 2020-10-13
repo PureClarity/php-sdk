@@ -42,6 +42,18 @@ class Endpoints
     }
 
     /**
+     * Gets the PureClarity feedback endpoint for the given region
+     *
+     * @param integer $region
+     * @return string
+     * @throws Exception
+     */
+    public function getFeedbackEndpoint($region)
+    {
+        return $this->getApiUrl($region) . '/api/plugin/feedback';
+    }
+
+    /**
      * Gets the PureClarity next steps completion endpoint for the given region
      *
      * @param integer $region
