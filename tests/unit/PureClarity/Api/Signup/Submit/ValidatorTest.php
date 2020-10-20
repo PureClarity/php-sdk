@@ -58,6 +58,8 @@ class ValidatorTest extends MockeryTestCase
 
     /**
      * Tests that a fully valid set of parameters gets handled correctly
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
      */
     public function testValid()
     {
@@ -91,6 +93,8 @@ class ValidatorTest extends MockeryTestCase
 
     /**
      * Tests that an invalid region gets handled correctly
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
      */
     public function testInvalidRegion()
     {
@@ -106,6 +110,8 @@ class ValidatorTest extends MockeryTestCase
 
     /**
      * Tests that an invalid email gets handled correctly
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
      */
     public function testInvalidEmail()
     {
@@ -123,6 +129,8 @@ class ValidatorTest extends MockeryTestCase
 
     /**
      * Tests that an invalid url gets handled correctly
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
      */
     public function testInvalidUrl()
     {
@@ -140,6 +148,8 @@ class ValidatorTest extends MockeryTestCase
 
     /**
      * Tests that an invalid url with bad scheme gets handled correctly
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
      */
     public function testInvalidUrlBadScheme()
     {
@@ -157,6 +167,8 @@ class ValidatorTest extends MockeryTestCase
 
     /**
      * Tests that a weak password gets handled correctly
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
      */
     public function testInvalidPassword()
     {

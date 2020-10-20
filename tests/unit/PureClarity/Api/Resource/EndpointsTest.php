@@ -86,6 +86,134 @@ class EndpointsTest extends MockeryTestCase
     }
 
     /**
+     * Tests that the Dashboard endpoint is returned correctly - with env variable set to override the real value
+     * @throws Exception
+     */
+    public function testGetDashboardEndpoint()
+    {
+        putenv('PURECLARITY_HOST=http://127.0.0.1');
+        $this->mockRegions();
+        $endpoint = $this->subject->getDashboardEndpoint(1);
+
+        $this->assertEquals(
+            getenv('PURECLARITY_HOST') . '/api/plugin/dashboard',
+            $endpoint
+        );
+    }
+
+    /**
+     * Tests that the Dashboard endpoint is returned correctly - with env set to empty so it returns a real value
+     * @throws Exception
+     */
+    public function testGetDashboardEndpointReal()
+    {
+        putenv('PURECLARITY_HOST=');
+        $this->mockRegions();
+        $endpoint = $this->subject->getDashboardEndpoint(1);
+
+        $this->assertEquals(
+            self::EU_ENDPOINT_URL . '/api/plugin/dashboard',
+            $endpoint
+        );
+    }
+
+    /**
+     * Tests that the Delete endpoint is returned correctly - with env variable set to override the real value
+     * @throws Exception
+     */
+    public function testGetDeleteEndpoint()
+    {
+        putenv('PURECLARITY_HOST=http://127.0.0.1');
+        $this->mockRegions();
+        $endpoint = $this->subject->getDeleteEndpoint(1);
+
+        $this->assertEquals(
+            getenv('PURECLARITY_HOST') . '/api/plugin/delete',
+            $endpoint
+        );
+    }
+
+    /**
+     * Tests that the Delete endpoint is returned correctly - with env set to empty so it returns a real value
+     * @throws Exception
+     */
+    public function testGetDeleteEndpointReal()
+    {
+        putenv('PURECLARITY_HOST=');
+        $this->mockRegions();
+        $endpoint = $this->subject->getDeleteEndpoint(1);
+
+        $this->assertEquals(
+            self::EU_ENDPOINT_URL . '/api/plugin/delete',
+            $endpoint
+        );
+    }
+
+    /**
+     * Tests that the Feedback endpoint is returned correctly - with env variable set to override the real value
+     * @throws Exception
+     */
+    public function testGetFeedbackEndpoint()
+    {
+        putenv('PURECLARITY_HOST=http://127.0.0.1');
+        $this->mockRegions();
+        $endpoint = $this->subject->getFeedbackEndpoint(1);
+
+        $this->assertEquals(
+            getenv('PURECLARITY_HOST') . '/api/plugin/feedback',
+            $endpoint
+        );
+    }
+
+    /**
+     * Tests that the Feedback endpoint is returned correctly - with env set to empty so it returns a real value
+     * @throws Exception
+     */
+    public function testGetFeedbackEndpointReal()
+    {
+        putenv('PURECLARITY_HOST=');
+        $this->mockRegions();
+        $endpoint = $this->subject->getFeedbackEndpoint(1);
+
+        $this->assertEquals(
+            self::EU_ENDPOINT_URL . '/api/plugin/feedback',
+            $endpoint
+        );
+    }
+
+    /**
+     * Tests that the Next Steps Complete endpoint is returned correctly - with env variable set to override the real value
+     * @throws Exception
+     */
+    public function testGetNextStepsCompleteEndpoint()
+    {
+        putenv('PURECLARITY_HOST=http://127.0.0.1');
+        $this->mockRegions();
+        $endpoint = $this->subject->getNextStepsCompleteEndpoint(1);
+
+        $this->assertEquals(
+            getenv('PURECLARITY_HOST') . '/api/next-steps/complete',
+            $endpoint
+        );
+    }
+
+    /**
+     * Tests that the Next Steps Complete endpoint is returned correctly - with env set to empty so it returns a real value
+     * @throws Exception
+     */
+    public function testGetNextStepsCompleteEndpointReal()
+    {
+        putenv('PURECLARITY_HOST=');
+        $this->mockRegions();
+        $endpoint = $this->subject->getNextStepsCompleteEndpoint(1);
+
+        $this->assertEquals(
+            self::EU_ENDPOINT_URL . '/api/next-steps/complete',
+            $endpoint
+        );
+    }
+
+    /**
      * Tests that the Delta endpoint is returned correctly - with env variable set to override the real value
      * @throws Exception
      */

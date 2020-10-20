@@ -323,6 +323,42 @@ class ProductTest extends MockeryTestCase
     }
 
     /**
+     * Tests that error status codes are handled correctly
+     *
+     * @throws Exception
+     */
+    public function testOtherError()
+    {
+        $expectedBody = $this->getExpectedBody(
+            [
+                ['SKU' => 'test123']
+            ],
+            []
+        );
+
+        $this->mockEndpoint();
+        $this->mockCurl($expectedBody, 200, 'An error response', 'An error');
+
+        $error = '';
+        try {
+            $this->subject->addData(['SKU' => 'test123']);
+            $response = $this->subject->send();
+
+            $this->assertEquals(
+                'An error response',
+                $response[0]['body']
+            );
+        } catch (Exception $e) {
+            $error = $e->getMessage();
+        }
+
+        $this->assertEquals(
+            'Error: An error',
+            $error
+        );
+    }
+
+    /**
      * Generates an expected request body function
      *
      * @param mixed[] $data - any product data to send

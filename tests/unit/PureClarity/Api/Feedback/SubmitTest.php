@@ -4,24 +4,22 @@
  * See LICENSE.txt for license details.
  */
 
-namespace PureClarity\Tests\Unit\Api\Signup\Submit;
+namespace PureClarity\Tests\Unit\Api\Feedback;
 
 use Exception;
 use Mockery\MockInterface;
-use PureClarity\Api\Resource\Regions;
-use PureClarity\Api\Signup\Submit;
-use PureClarity\Api\Signup\Submit\Requestor;
+use PureClarity\Api\Feedback\Submit;
 use Mockery as m;
 use Mockery\Adapter\Phpunit\MockeryTestCase;
 
 /**
- * Class RequestorTest
+ * Class SubmitTest
  *
- * Unit Test for PureClarity\Api\Signup\Submit\Requestor
+ * Unit Test for PureClarity\Api\Feedback\Submit
  *
- * @see \PureClarity\Api\Signup\Submit\Requestor
+ * @see \PureClarity\Api\Feedback\Submit
  */
-class RequestorTest extends MockeryTestCase
+class SubmitTest extends MockeryTestCase
 {
     /** @var string */
     const ENDPOINT = 'http://127.0.0.1/';
@@ -30,45 +28,28 @@ class RequestorTest extends MockeryTestCase
     const REQUEST_ID = 'ABCDEFGHI';
 
     /** @var mixed[] */
-    private $defaultRequest = [
-        Submit::PARAM_FIRSTNAME => 'firstname',
-        Submit::PARAM_LASTNAME => 'lastname',
-        Submit::PARAM_EMAIL => 'email',
-        Submit::PARAM_COMPANY => 'company',
-        Submit::PARAM_PASSWORD => 'password',
-        Submit::PARAM_STORE_NAME => 'store_name',
-        Submit::PARAM_REGION => 1,
-        Submit::PARAM_URL => 'url',
-        Submit::PARAM_PLATFORM => 'platform',
-        Submit::PARAM_CURRENCY => 'currency',
-        Submit::PARAM_TIMEZONE => 'timezone',
+    private $defaultBody = [
+        'AccessKey' => 'accessKey',
+        'SecretKey' => 'secretKey',
+        'Feedback' => 'here is some feedback',
+        'Platform' => 'PHPUnit'
     ];
 
-    /** @var mixed[] */
-    private $defaultProcessedRequest = [
-        'Id' => self::REQUEST_ID,
-        'Platform' => 'platform',
-        'Email' => 'email',
-        'FirstName' => 'firstname',
-        'LastName' => 'lastname',
-        'Company' => 'company',
-        'Region' => 'region-name',
-        'Currency' => 'currency',
-        'TimeZone' => 'timezone',
-        'Url' => 'url',
-        'Password' => 'password',
-        'StoreName' => 'store_name'
-    ];
-
-    /** @var Requestor $subject */
+    /** @var Submit $subject */
     private $subject;
 
     /**
-     * Sets up the test subject - \PureClarity\Api\Signup\Submit\Requestor class
+     * Sets up the test subject - \PureClarity\Api\Feedback\Submit class
      */
     protected function setUp()
     {
-        $this->subject = new Requestor();
+        $this->subject = new Submit(
+            'accessKey',
+            'secretKey',
+            1,
+            'here is some feedback',
+            'PHPUnit'
+        );
     }
 
     /**
@@ -76,7 +57,7 @@ class RequestorTest extends MockeryTestCase
      */
     public function testInstance()
     {
-        $this->assertInstanceOf(Requestor::class, $this->subject);
+        $this->assertInstanceOf(Submit::class, $this->subject);
     }
 
     /**
@@ -90,16 +71,14 @@ class RequestorTest extends MockeryTestCase
         $body = json_encode([]);
 
         $this->mockEndpoint();
-        $this->mockRegions();
         $this->mockCurl($body);
 
-        $result = $this->subject->send(self::REQUEST_ID, $this->defaultRequest);
+        $result = $this->subject->request();
 
         $this->assertEquals(
             [
                 'status' => 200,
-                'body' => $body,
-                'error' => ''
+                'body' => $body
             ],
             $result
         );
@@ -115,19 +94,43 @@ class RequestorTest extends MockeryTestCase
     {
         $body = json_encode([]);
 
-        $this->mockRegions();
         $this->mockEndpoint();
         $this->mockCurl($body, 400, 'An error');
 
-        $result = $this->subject->send(self::REQUEST_ID, $this->defaultRequest);
+        try {
+            $this->subject->request();
+        } catch (Exception $e) {
+            $error = $e->getMessage();
+        }
 
         $this->assertEquals(
-            [
-                'status' => 400,
-                'body' => $body,
-                'error' => 'An error'
-            ],
-            $result
+            'Error: HTTP 400 Response | Error Message: An error | Body: []',
+            $error
+        );
+    }
+
+    /**
+     * Test that a send that gets an error response gets handled correctly
+     * @runInSeparateProcess
+     * @preserveGlobalState disabled
+     * @throws Exception
+     */
+    public function testErrorResponse()
+    {
+        $body = json_encode([]);
+
+        $this->mockEndpoint();
+        $this->mockCurl($body, 200, 'An error');
+
+        try {
+            $this->subject->request();
+        } catch (Exception $e) {
+            $error = $e->getMessage();
+        }
+
+        $this->assertEquals(
+            'Error: An error',
+            $error
         );
     }
 
@@ -141,13 +144,12 @@ class RequestorTest extends MockeryTestCase
     {
         $body = json_encode([]);
 
-        $this->mockRegions();
         $this->mockEndpoint();
         $this->mockCurl($body, 400, 'An error', 'An Exception');
 
         $error = '';
         try {
-            $this->subject->send(self::REQUEST_ID, $this->defaultRequest);
+            $this->subject->request();
         } catch (Exception $e) {
             $error = $e->getMessage();
         }
@@ -171,11 +173,11 @@ class RequestorTest extends MockeryTestCase
      */
     private function mockCurl($body = '', $status = 200, $error = '', $exception = '')
     {
-        $client = m::mock('overload:PureClarity\Api\Transfer\Curl');
+        $client = m::mock('overload:\PureClarity\Api\Transfer\Curl');
 
         if (empty($exception)) {
             $client->shouldReceive('post')
-                ->with(self::ENDPOINT, json_encode($this->defaultProcessedRequest))
+                ->with(self::ENDPOINT, json_encode($this->defaultBody))
                 ->times(1);
 
             $client->shouldReceive('getStatus')
@@ -191,10 +193,13 @@ class RequestorTest extends MockeryTestCase
                 ->andReturn($error);
         } else {
             $client->shouldReceive('post')
-                ->with(self::ENDPOINT, json_encode($this->defaultProcessedRequest))
+                ->with(self::ENDPOINT, json_encode($this->defaultBody))
                 ->times(1)
                 ->andThrow(new Exception($exception));
         }
+
+        $client->shouldReceive('setDataType')
+            ->times(1);
 
         return $client;
     }
@@ -208,27 +213,10 @@ class RequestorTest extends MockeryTestCase
     private function mockEndpoint()
     {
         $endpoints = m::mock('overload:PureClarity\Api\Resource\Endpoints');
-        $endpoints->shouldReceive('getSignupRequestEndpoint')
+        $endpoints->shouldReceive('getFeedbackEndpoint')
             ->times(1)
             ->with('1')
             ->andReturn(self::ENDPOINT);
-
-        return $endpoints;
-    }
-
-    /**
-     * Mocks the Regions class
-     *
-     * @see \PureClarity\Api\Resource\Regions
-     * @return MockInterface
-     */
-    private function mockRegions()
-    {
-        $endpoints = m::mock('overload:' . Regions::class);
-        $endpoints->shouldReceive('getRegionName')
-            ->times(1)
-            ->with(1)
-            ->andReturn('region-name');
 
         return $endpoints;
     }
