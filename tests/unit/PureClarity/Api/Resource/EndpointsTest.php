@@ -118,6 +118,38 @@ class EndpointsTest extends MockeryTestCase
     }
 
     /**
+     * Tests that the Validate Account endpoint is returned correctly - with env variable set to override the real value
+     * @throws Exception
+     */
+    public function testGetValidateAccountEndpoint()
+    {
+        putenv('PURECLARITY_HOST=http://127.0.0.1');
+        $this->mockRegions();
+        $endpoint = $this->subject->getValidateAccountEndpoint(1);
+
+        $this->assertEquals(
+            getenv('PURECLARITY_HOST') . '/api/plugin/validate-account',
+            $endpoint
+        );
+    }
+
+    /**
+     * Tests that the Validate Account endpoint is returned correctly - with env set to empty so it returns a real value
+     * @throws Exception
+     */
+    public function testGetValidateAccountEndpointReal()
+    {
+        putenv('PURECLARITY_HOST=');
+        $this->mockRegions();
+        $endpoint = $this->subject->getValidateAccountEndpoint(1);
+
+        $this->assertEquals(
+            self::EU_ENDPOINT_URL . '/api/plugin/validate-account',
+            $endpoint
+        );
+    }
+
+    /**
      * Tests that the Delete endpoint is returned correctly - with env variable set to override the real value
      * @throws Exception
      */
