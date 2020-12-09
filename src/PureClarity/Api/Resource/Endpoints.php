@@ -90,6 +90,18 @@ class Endpoints
     }
 
     /**
+     * Gets the PureClarity add store endpoint for the given region
+     *
+     * @param integer $region
+     * @return string
+     * @throws Exception
+     */
+    public function getAddStoreEndpoint($region)
+    {
+        return $this->getApiUrl($region) . '/api/plugin/add-store';
+    }
+
+    /**
      * Gets the PureClarity signup request endpoint for the given region
      *
      * @param integer $region
