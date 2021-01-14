@@ -55,6 +55,9 @@ class Requestor
     /** @var string */
     const PARAM_TIMEZONE = 'TimeZone';
 
+    /** @var string */
+    const PARAM_PHONE = 'Phone';
+
     /**
      * Sends the Signup request to PureClarity
      *
@@ -115,7 +118,8 @@ class Requestor
             self::PARAM_TIMEZONE => $params[Submit::PARAM_TIMEZONE],
             self::PARAM_URL => $params[Submit::PARAM_URL],
             self::PARAM_PASSWORD => $params[Submit::PARAM_PASSWORD],
-            self::PARAM_STORE_NAME => $params[Submit::PARAM_STORE_NAME]
+            self::PARAM_STORE_NAME => $params[Submit::PARAM_STORE_NAME],
+            self::PARAM_PHONE => isset($params[Submit::PARAM_PHONE]) ? $params[Submit::PARAM_PHONE] : '',
         ];
 
         return json_encode($requestData);

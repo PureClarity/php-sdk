@@ -42,6 +42,7 @@ class RequestorTest extends MockeryTestCase
         Submit::PARAM_PLATFORM => 'platform',
         Submit::PARAM_CURRENCY => 'currency',
         Submit::PARAM_TIMEZONE => 'timezone',
+        Submit::PARAM_PHONE => 'phone'
     ];
 
     /** @var mixed[] */
@@ -57,7 +58,8 @@ class RequestorTest extends MockeryTestCase
         'TimeZone' => 'timezone',
         'Url' => 'url',
         'Password' => 'password',
-        'StoreName' => 'store_name'
+        'StoreName' => 'store_name',
+        'Phone' => 'phone'
     ];
 
     /** @var Requestor $subject */

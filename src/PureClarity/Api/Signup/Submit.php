@@ -52,6 +52,9 @@ class Submit
     const PARAM_TIMEZONE = 'timezone';
 
     /** @var string */
+    const PARAM_PHONE = 'phone';
+
+    /** @var string */
     private $requestId;
 
     /**
