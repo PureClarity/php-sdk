@@ -39,7 +39,7 @@ class Processor
             $result['response'] = $this->processBody($response);
             $result['errors'] = $this->processErrors($result['response'], $response);
 
-            if ($response['status'] === 200) {
+            if ($response['status'] >= 200 && $response['status'] <= 299) {
                 $result['success'] = true;
             }
         }
