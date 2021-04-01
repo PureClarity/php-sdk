@@ -92,7 +92,7 @@ class Processor
     private function isComplete($response)
     {
         $complete = false;
-        if ($response['status'] === 200 &&
+        if (($response['status'] >= 200 && $response['status'] <= 299) &&
             $this->isResponseBodyValid($response['response']) &&
             $response['response']['Complete'] === true
         ) {

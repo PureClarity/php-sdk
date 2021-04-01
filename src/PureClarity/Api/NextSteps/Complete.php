@@ -75,7 +75,7 @@ class Complete
         $error = $curl->getError();
         $body = $curl->getBody();
 
-        if ($status !== 200) {
+        if ($status < 200 || $status > 299) {
             throw new Exception(
                 'Error: HTTP ' . $status . ' Response | ' .
                 'Error Message: ' . $error . ' | ' .
