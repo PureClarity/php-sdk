@@ -68,7 +68,7 @@ class RequestorTest extends MockeryTestCase
     /**
      * Sets up the test subject - \PureClarity\Api\Signup\Submit\Requestor class
      */
-    protected function setUp()
+    protected function setup() : void
     {
         $this->subject = new Requestor();
     }

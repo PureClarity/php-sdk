@@ -31,7 +31,7 @@ class ValidatorTest extends MockeryTestCase
     /**
      * Sets up the test subject - \PureClarity\Api\Account\Validate\Validator class
      */
-    protected function setUp()
+    protected function setUp():void
     {
         $this->subject = new Validator();
     }

@@ -47,7 +47,7 @@ class TransferTest extends MockeryTestCase
     /**
      * Sets up the test subject - \PureClarity\Api\Feed\Transfer class
      */
-    protected function setUp()
+    protected function setup() : void
     {
         $this->subject = new Transfer(
             self::FEED_TYPE,

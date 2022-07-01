@@ -24,7 +24,7 @@ class ProcessorTest extends MockeryTestCase
     /**
      * Sets up the test subject - \PureClarity\Api\Signup\Submit\Processor class
      */
-    protected function setUp()
+    protected function setup() : void
     {
         $this->subject = new Processor();
     }

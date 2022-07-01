@@ -30,7 +30,7 @@ class ProductTest extends MockeryTestCase
     /**
      * Sets up the test subject - \PureClarity\Api\Delta\Type\Product class
      */
-    protected function setUp()
+    protected function setup() : void
     {
         $this->subject = new Product(
             'ACCESS_KEY',

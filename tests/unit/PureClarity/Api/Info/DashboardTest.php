@@ -39,7 +39,7 @@ class DashboardTest extends MockeryTestCase
     /**
      * Sets up the test subject - \PureClarity\Api\Info\Dashboard class
      */
-    protected function setUp()
+    protected function setup() : void
     {
         $this->subject = new Dashboard(
             'accessKey',
