@@ -3,7 +3,7 @@
     "description": "PureClarity Intelligent Personalization - PHP SDK",
     "type": "library",
     "license": ["OSL-3.0"],
-    "version": "2.1.2",
+    "version": "3.0.0",
     "require": {
         "php": "^5.6|^7.0|^8.0",
         "ext-json": "*",
