@@ -39,7 +39,7 @@ class CompleteTest extends MockeryTestCase
     /**
      * Sets up the test subject - \PureClarity\Api\NextSteps\Complete class
      */
-    protected function setUp()
+    protected function setup() : void
     {
         $this->subject = new Complete(
             'accessKey',

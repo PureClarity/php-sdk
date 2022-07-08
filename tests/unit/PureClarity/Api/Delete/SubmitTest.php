@@ -40,7 +40,7 @@ class SubmitTest extends MockeryTestCase
     /**
      * Sets up the test subject - \PureClarity\Api\Delete\Submit class
      */
-    protected function setUp()
+    protected function setup() : void
     {
         $this->subject = new Submit(
             'accessKey',

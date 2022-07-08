@@ -51,7 +51,7 @@ class SubmitTest extends MockeryTestCase
      *
      * @return void
      */
-    protected function setUp()
+    protected function setup() : void
     {
         $this->subject = new Submit();
 

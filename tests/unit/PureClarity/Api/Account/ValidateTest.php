@@ -35,7 +35,7 @@ class ValidateTest extends MockeryTestCase
      *
      * @return void
      */
-    protected function setUp()
+    protected function setUp():void
     {
         $this->subject = new Validate();
     }
