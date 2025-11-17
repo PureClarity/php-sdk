@@ -32,6 +32,9 @@ class Transfer
     /** @var string $feedId */
     private $feedId;
 
+    /** @var string $endpointUrl - Cached SFTP endpoint URL */
+    private $endpointUrl;
+
     /**
      * @param string $feedType - Feed Type, used in naming of the feed file
      * @param string $accessKey - Application Access Key
@@ -133,7 +136,13 @@ class Transfer
     private function send($endPoint, $data)
     {
         $request = $this->buildRequest($data);
-        $url = $this->getSftpEndpoint($this->region) . $endPoint;
+        
+        // Cache the endpoint URL on first use
+        if (!$this->endpointUrl) {
+            $this->endpointUrl = $this->getSftpEndpoint($this->region);
+        }
+        
+        $url = $this->endpointUrl . $endPoint;
         $request = http_build_query($request);
 
         $curl = new Curl();
@@ -152,7 +161,7 @@ class Transfer
             );
         }
 
-        if (empty($error) === false) {
+        if (!empty($error)) {
             throw new Exception($error);
         }
 
