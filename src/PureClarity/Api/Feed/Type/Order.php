@@ -18,6 +18,9 @@ class Order extends Feed
     /** @var string $feedType */
     protected $feedType = self::FEED_TYPE_ORDER;
 
+    /** @var string $itemSeparator - No separator for CSV format */
+    protected $itemSeparator = '';
+
     /** @var string[] $requiredFields - Fields that must be present in the data (regardless of content) */
     protected $requiredFields = [
         'OrderID',
@@ -53,19 +56,19 @@ class Order extends Feed
      */
     public function processData($orderData)
     {
-        $data = '';
+        $lines = [];
         foreach ($orderData as $orderLine) {
-            $data .= PHP_EOL . $orderLine['OrderID'] . ',' .
-                     $orderLine['UserId'] . ',' .
-                     $orderLine['Email'] . ',' .
-                     $orderLine['DateTime'] . ',' .
-                     $orderLine['ProdCode'] . ',' .
-                     $orderLine['Quantity'] . ',' .
-                     $orderLine['UnitPrice'] . ',' .
-                     $orderLine['LinePrice'];
+            $lines[] = PHP_EOL . $orderLine['OrderID'] . ',' .
+                      $orderLine['UserId'] . ',' .
+                      $orderLine['Email'] . ',' .
+                      $orderLine['DateTime'] . ',' .
+                      $orderLine['ProdCode'] . ',' .
+                      $orderLine['Quantity'] . ',' .
+                      $orderLine['UnitPrice'] . ',' .
+                      $orderLine['LinePrice'];
         }
 
-        return $data;
+        return implode('', $lines);
     }
 
     /**
@@ -78,10 +81,9 @@ class Order extends Feed
     {
         $errors = [];
         foreach ($orderData as $orderLine) {
-            $errors = array_merge(
-                $errors,
-                parent::validate($orderLine)
-            );
+            foreach (parent::validate($orderLine) as $error) {
+                $errors[] = $error;
+            }
         }
 
         return $errors;
