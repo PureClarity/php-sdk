@@ -48,8 +48,11 @@ abstract class Feed
     /** @var string[] $nonEmptyFields - Fields that must contain data */
     protected $nonEmptyFields = [];
 
-    /** @var string $pageData - Feed Data */
-    protected $pageData = '';
+    /** @var string[] $pageData - Feed Data buffer */
+    protected $pageData = [];
+
+    /** @var string $itemSeparator - Separator between items in a page */
+    protected $itemSeparator = ',';
 
     /** @var integer $pageSize - Feed Handler class */
     protected $pageSize = 50;
@@ -100,16 +103,17 @@ abstract class Feed
     public function append($data)
     {
         $errors = $this->validate($data);
-        if (empty($errors) === false) {
+        if (!empty($errors)) {
             throw new Exception(implode('|', $errors));
         }
 
         $this->dataIndex++;
-        $this->pageData .= $this->processData($data);
+        $this->pageData[] = $this->processData($data);
 
         if (($this->dataIndex % $this->pageSize) === 0) {
-            $this->transfer->append($this->pageData);
-            $this->pageData = '';
+            $separator = ($this->dataIndex > $this->pageSize) ? $this->itemSeparator : '';
+            $this->transfer->append($separator . implode($this->itemSeparator, $this->pageData));
+            $this->pageData = [];
         }
     }
 
@@ -122,11 +126,6 @@ abstract class Feed
     protected function processData($data)
     {
         $data['_index'] = $this->dataIndex;
-
-        if ($this->dataIndex >= 2) {
-            $this->pageData .= ',';
-        }
-
         return json_encode($data);
     }
 
@@ -161,9 +160,10 @@ abstract class Feed
      */
     public function end()
     {
-        if ($this->pageData !== '') {
-            $this->transfer->append($this->pageData);
-            $this->pageData = '';
+        if (!empty($this->pageData)) {
+            $separator = ($this->dataIndex > $this->pageSize) ? $this->itemSeparator : '';
+            $this->transfer->append($separator . implode($this->itemSeparator, $this->pageData));
+            $this->pageData = [];
         }
 
         $this->transfer->close($this->feedEnd);
