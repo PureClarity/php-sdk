@@ -169,10 +169,10 @@ class CurlTest extends MockeryTestCase
             ->with(CURLOPT_FOLLOWLOCATION, true)
             ->times(1);
         $client->shouldReceive('setopt')
-            ->with(CURLOPT_SSL_VERIFYPEER, false)
+            ->with(CURLOPT_SSL_VERIFYPEER, true)
             ->times(1);
         $client->shouldReceive('setopt')
-            ->with(CURLOPT_SSL_VERIFYHOST, 0)
+            ->with(CURLOPT_SSL_VERIFYHOST, 2)
             ->times(1);
         $client->shouldReceive('setopt')
             ->with(CURLOPT_FAILONERROR, false)

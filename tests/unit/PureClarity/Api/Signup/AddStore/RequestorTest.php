@@ -169,7 +169,7 @@ class RequestorTest extends MockeryTestCase
 
         if (empty($exception)) {
             $client->shouldReceive('post')
-                ->with(self::ENDPOINT, json_encode($this->defaultProcessedRequest))
+                ->with(self::ENDPOINT, json_encode($this->defaultProcessedRequest), [CURLOPT_TIMEOUT_MS => 30000])
                 ->times(1);
 
             $client->shouldReceive('getStatus')
@@ -185,7 +185,7 @@ class RequestorTest extends MockeryTestCase
                 ->andReturn($error);
         } else {
             $client->shouldReceive('post')
-                ->with(self::ENDPOINT, json_encode($this->defaultProcessedRequest))
+                ->with(self::ENDPOINT, json_encode($this->defaultProcessedRequest), [CURLOPT_TIMEOUT_MS => 30000])
                 ->times(1)
                 ->andThrow(new Exception($exception));
         }

@@ -369,7 +369,7 @@ class ProductTest extends MockeryTestCase
     {
         $body = [
             'AppKey'         => 'ACCESS_KEY',
-            'Secret'         => 'SECRET_KEY',
+            'SecretKey'      => 'SECRET_KEY',
             'Products'       => $data,
             'DeleteProducts' => $deletes,
             'Format'         => 'magentoplugin1.0.0'

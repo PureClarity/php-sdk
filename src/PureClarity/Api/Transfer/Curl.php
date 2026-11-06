@@ -23,11 +23,25 @@ class Curl
         CURLOPT_TIMEOUT_MS => 5000,
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_SSL_VERIFYPEER => false,
-        CURLOPT_SSL_VERIFYHOST => 0,
+        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_SSL_VERIFYHOST => 2,
         CURLOPT_FAILONERROR => false,
         CURLOPT_POST => true
     ];
+
+    /** @var string|null $fallbackCaBundle - CA bundle file to use when PHP has no CA store configured */
+    private static $fallbackCaBundle;
+
+    /**
+     * Sets a CA bundle file to verify SSL certificates with when PHP has no CA store configured,
+     * so requests still work on hosts that are missing one.
+     *
+     * @param string $path - path to a PEM CA bundle file
+     */
+    public static function setFallbackCaBundle($path)
+    {
+        self::$fallbackCaBundle = $path;
+    }
 
     /** @var string $dataType */
     private $dataType = 'application/json';
@@ -75,6 +89,10 @@ class Curl
             $request->setopt($optionKey, $optValue);
         }
 
+        if (self::$fallbackCaBundle && is_file(self::$fallbackCaBundle) && !$this->hasCaStore()) {
+            $request->setopt(CURLOPT_CAINFO, self::$fallbackCaBundle);
+        }
+
         foreach ($options as $optionKey => $optValue) {
             $request->setopt($optionKey, $optValue);
         }
@@ -96,6 +114,29 @@ class Curl
         $this->status = isset($info['http_code']) ? $info['http_code'] : null;
 
         $request->close();
+    }
+
+    /**
+     * Checks whether PHP has a CA store for curl to verify SSL certificates with: either the
+     * curl.cainfo setting, or OpenSSL's default certificate file or directory.
+     * The checks are silenced because open_basedir can forbid them; that counts as no store.
+     *
+     * @return bool
+     */
+    private function hasCaStore()
+    {
+        $caInfo = ini_get('curl.cainfo');
+        if ($caInfo && @is_file($caInfo)) {
+            return true;
+        }
+
+        if (!function_exists('openssl_get_cert_locations')) {
+            return false;
+        }
+
+        $locations = openssl_get_cert_locations();
+
+        return @is_file($locations['default_cert_file']) || @is_dir($locations['default_cert_dir']);
     }
 
     /**
