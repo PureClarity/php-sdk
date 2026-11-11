@@ -57,6 +57,16 @@ class Client
     }
 
     /**
+     * Gets the error number for the curl request using curl_errno
+     *
+     * @return int
+     */
+    public function errno()
+    {
+        return curl_errno($this->request);
+    }
+
+    /**
      * Gets the info about the CURL request using curl_info
      *
      * @return mixed

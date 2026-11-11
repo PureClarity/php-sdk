@@ -29,12 +29,15 @@ class Curl
         CURLOPT_POST => true
     ];
 
-    /** @var string|null $fallbackCaBundle - CA bundle file to use when PHP has no CA store configured */
+    /** @var int[] - curl errors for a failed certificate check: no trusted CA for the certificate, or no readable CA file */
+    const CERT_VERIFY_ERRORS = [60, 77];
+
+    /** @var string|null $fallbackCaBundle - CA bundle file to retry with when certificate verification fails */
     private static $fallbackCaBundle;
 
     /**
-     * Sets a CA bundle file to verify SSL certificates with when PHP has no CA store configured,
-     * so requests still work on hosts that are missing one.
+     * Sets a CA bundle file to retry a request with when certificate verification fails, such as on
+     * hosts where PHP has no CA store configured. Without one, Composer's bundle is used when available.
      *
      * @param string $path - path to a PEM CA bundle file
      */
@@ -80,6 +83,28 @@ class Curl
      */
     public function post($url, $payload, $options = [])
     {
+        $errno = $this->send($url, $payload, $options);
+
+        // PHP's CA store couldn't verify the certificate, or PHP has none: retry once with the fallback.
+        // The request body was never sent, because the connection failed during the TLS handshake.
+        if (in_array($errno, self::CERT_VERIFY_ERRORS, true)) {
+            $fallbackOptions = $this->getFallbackCaOptions();
+            if ($fallbackOptions) {
+                $this->send($url, $payload, $fallbackOptions + $options);
+            }
+        }
+    }
+
+    /**
+     * Sends the request and records its response
+     *
+     * @param string $url - URL to post to
+     * @param string $payload - Data to send
+     * @param array $options - options to set (can be used to override defaults)
+     * @return int - the curl error number, 0 if the request succeeded
+     */
+    private function send($url, $payload, $options)
+    {
         $request = new Client();
         $request->init();
 
@@ -87,10 +112,6 @@ class Curl
 
         foreach ($this->options as $optionKey => $optValue) {
             $request->setopt($optionKey, $optValue);
-        }
-
-        if (self::$fallbackCaBundle && is_file(self::$fallbackCaBundle) && !$this->hasCaStore()) {
-            $request->setopt(CURLOPT_CAINFO, self::$fallbackCaBundle);
         }
 
         foreach ($options as $optionKey => $optValue) {
@@ -106,37 +127,48 @@ class Curl
             ]
         );
 
+        $errno = 0;
+        $this->error = '';
         if (!$this->body = $request->exec()) {
             $this->error = $request->error();
+            $errno = $request->errno();
         }
 
         $info = $request->getinfo();
         $this->status = isset($info['http_code']) ? $info['http_code'] : null;
 
         $request->close();
+
+        return $errno;
     }
 
     /**
-     * Checks whether PHP has a CA store for curl to verify SSL certificates with: either the
-     * curl.cainfo setting, or OpenSSL's default certificate file or directory.
-     * The checks are silenced because open_basedir can forbid them; that counts as no store.
+     * Gets the curl options to retry a request with after certificate verification failed
      *
-     * @return bool
+     * @return mixed[] - empty when there is nothing to retry with
      */
-    private function hasCaStore()
+    private function getFallbackCaOptions()
     {
-        $caInfo = ini_get('curl.cainfo');
-        if ($caInfo && @is_file($caInfo)) {
-            return true;
+        $options = [];
+
+        $caBundle = self::$fallbackCaBundle;
+        if (!$caBundle && class_exists('Composer\CaBundle\CaBundle')) {
+            // Composer installs, such as Magento: use the Mozilla CA bundle that ships with composer/ca-bundle
+            $caBundle = \Composer\CaBundle\CaBundle::getBundledCaBundlePath();
         }
 
-        if (!function_exists('openssl_get_cert_locations')) {
-            return false;
+        // Silenced because open_basedir can forbid the check
+        if ($caBundle && @is_file($caBundle)) {
+            $options[CURLOPT_CAINFO] = $caBundle;
         }
 
-        $locations = openssl_get_cert_locations();
+        // Windows keeps trusted CAs in its own certificate store, which PHP's curl doesn't read by default.
+        // Trust it as well, so CAs installed there, such as a company's TLS proxy CA, work (PHP 8.2+, libcurl 7.71+).
+        if (DIRECTORY_SEPARATOR === '\\' && defined('CURLSSLOPT_NATIVE_CA')) {
+            $options[CURLOPT_SSL_OPTIONS] = CURLSSLOPT_NATIVE_CA;
+        }
 
-        return @is_file($locations['default_cert_file']) || @is_dir($locations['default_cert_dir']);
+        return $options;
     }
 
     /**
