@@ -73,7 +73,8 @@ class Requestor
 
         $curl = new Curl();
 
-        $curl->post($url, $request);
+        // Creating the account can take longer than the default 5 second timeout
+        $curl->post($url, $request, [CURLOPT_TIMEOUT_MS => 30000]);
 
         return [
             'status' => $curl->getStatus(),

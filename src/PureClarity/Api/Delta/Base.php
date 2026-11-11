@@ -85,7 +85,7 @@ abstract class Base
     {
         return [
             'AppKey'         => $this->accessKey,
-            'Secret'         => $this->secretKey,
+            'SecretKey'      => $this->secretKey,
             $this->dataKey   => [],
             $this->deleteKey => [],
             'Format'         => 'magentoplugin1.0.0'
